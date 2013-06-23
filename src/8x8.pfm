@@ -1,0 +1,190 @@
+##
+## Conway's Game of Life - 8x8
+##   (http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
+##
+## Author: h6a_h4i
+##
+
+##
+## NOTEs:
+## - [\foo] is a commented-out command
+## - Lines which starts '#' are comments. 
+##   However it is not supported in grammer of Perfume GLOBAL SITE PROJECT #003 language.
+##   So you should not put any supported commands in sharp-started lines.
+## - After 32767 (2^15-1) literal/commands executed, the script stops. I think it's a limitation of ver.1.0.4 environment.
+##   As a result, ONLY 4 generations can be processed.
+
+# INITIAL CELLS 8x8 (offset = 0)
+[0][0][0][0][0][0][0][0]
+[0][0][0][0][0][0][0][0]
+[0][0][0][1][1][1][0][0]
+[0][0][0][1][0][1][0][0]
+[0][0][0][1][1][1][0][0]
+[0][0][0][0][0][0][0][0]
+[0][0][0][0][0][0][0][0]
+[0][0][0][0][0][0][0][0]
+
+# Offset adjustment (x 10 - 5)
+[-1][-1][-1][-1][-1]
+
+# Global loop (NOTE: 2^15-1 limitation)
+[10][repeat]
+
+##
+## Draw
+##
+
+# clear screen
+[draw 1]
+
+# global translation
+[push]
+[translate 45 45]
+
+# Y' --- {7, 6, 5 .. 1, 0}
+[8][repeat]
+	# X' --- {7, 6, 5 .. 1, 0}
+	[8][repeat]
+		# Y = (8 - 1) - Y' --- {0, 1, 2, .. 6, 7}
+		[ref -2][7][swap][sub]
+		# X = (8 - 1) - X' --- {0, 1, 2, .. 6, 7}
+		[ref -2][7][swap][sub]
+		# INDEX = (8 * Y) + X --- {1, 2, 3, .. 62, 63}
+		[ref -2][8][mul] [ref -2] [add]
+
+		# CELL(0, 0)
+		# subtract ((64 + 10))
+		[74][sub][ref]
+
+		[ifgt 0]
+			# Y * 60
+			[ref -2][mul 60]
+			# X * 60
+			[ref -2][mul 60]
+			# (X, Y)
+			[swap]
+			[push]
+				[translate]
+				[speed 1000]
+				[brush 0]
+				[draw 0]
+			[pop]
+		[end]
+
+		# remove X, Y
+		[remove]
+		[remove]
+	[end]
+[end]
+[pop]
+
+
+##
+## Update
+##
+[64][repeat]
+	# CENTER-INDEX
+	[ref -1][63][swap][sub]
+	# Y
+	[ref -1][div 8][floor]
+	# X
+	[ref -2][mod 8]
+	# TOP-LEFT INDEX
+	[ref -2][add 7][mod 8][mul 8] [ref -2][add 7][mod 8] [add]
+	# TOP INDEX
+	[ref -3][add 7][mod 8][mul 8] [ref -3][\add 0][mod 8] [add]
+	# TOP-RIGHT INDEX
+	[ref -4][add 7][mod 8][mul 8] [ref -4][add 1][mod 8] [add]
+	# LEFT INDEX
+	[ref -5][\add 0][mod 8][mul 8] [ref -5][add 7][mod 8] [add]
+	# CENTER INDEX
+	[ref -6][\add 0][mod 8][mul 8] [ref -6][\add 0][mod 8] [add]
+	# RIGHT INDEX
+	[ref -7][\add 0][mod 8][mul 8] [ref -7][add 1][mod 8] [add]
+	# BOTTOM-LEFT INDEX
+	[ref -8][add 1][mod 8][mul 8] [ref -8][add 7][mod 8] [add]
+	# BOTTOM INDEX
+	[ref -9][add 1][mod 8][mul 8] [ref -9][\add 0][mod 8] [add]
+	# BOTTOM-RIGHT INDEX
+	[ref -10][add 1][mod 8][mul 8] [ref -10][add 1][mod 8] [add]
+
+	# TOP-LEFT, TOP, TOP-RIGHT
+	[ref -9][ref -13][sub][add -20][add -63][ref]
+	[ref -9][ref -14][sub][add -21][add -63][ref]
+	[ref -9][ref -15][sub][add -22][add -63][ref]
+	# LEFT, CENTER, RIGHT
+	[ref -9][ref -16][sub][add -23][add -63][ref]
+	[0]
+	[ref -9][ref -18][sub][add -25][add -63][ref]
+	# BOTTOM-LEFT, BOTTOM, BOTTOM-RIGHT
+	[ref -9][ref -19][sub][add -26][add -63][ref]
+	[ref -9][ref -20][sub][add -27][add -63][ref]
+	[ref -9][ref -21][sub][add -28][add -63][ref]
+
+	# Count living neighbors
+	[add][add][add][add][add][add][add][add]
+
+	# CENTER
+	[ref -6][ref -14][sub][add -21][add -63][ref]
+	# Next-gen CENTER cell
+	[ref -1]
+
+	# if CENTER cell is living
+	[ref -2][ifgt 0]
+		# 1. Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+		[ref -3][iflt 2]
+			[\1000][\debug][\remove]
+			[remove][0]
+		[end]
+
+		# 2. Any live cell with two or three live neighbours lives on to the next generation.
+		[ref -3][ifgt 1]
+			[ref -3][iflt 4]
+				[\2000][\debug][\remove]
+			[end]
+		[end]
+
+		# 3. Any live cell with more than three live neighbours dies, as if by overcrowding.
+		[ref -3][ifgt 3]
+			[\3000][\debug][\remove]
+			[remove][0]
+		[end]
+	[end]
+	#else (CENTER cell is dead)
+	[ref -2][iflt 1]
+		# 4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+		[ref -3][ifgt 2]
+			[ref -3][iflt 4]
+				[\4000][\debug][\remove]
+				[remove][1]
+			[end]
+		[end]
+	[end]
+
+	# remove 14 stack entries
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap][remove]
+	[swap]
+[end]
+
+[delay 200]
+# put offset adjustments
+[-1][-1][-1][-1][-1]
+
+# copy global loop counter
+[ref -70]
+[end]
+
+# PAINT MODE FOOTER

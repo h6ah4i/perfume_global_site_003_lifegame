@@ -11,7 +11,7 @@
 ## - Lines which starts '#' are comments. 
 ##   However it is not supported in grammer of Perfume GLOBAL SITE PROJECT #003 language.
 ##   So you should not put any supported commands in sharp-started lines.
-## - After 32767 (2^15-1) literal/commands executed, the script stops. I think it's a limitation of ver.1.0.4 environment.
+## - After 65536 (2^16) literal/commands executed, the script stops. It's a limitation of ver.1.0.4 environment.
 ##   As a result, ONLY 4 generations can be processed.
 
 # INITIAL CELLS 8x8 (offset = 0)

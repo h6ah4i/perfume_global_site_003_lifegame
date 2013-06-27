@@ -16,7 +16,7 @@ How to run
 
 Known issues
 ---
-- Only 32767 literals/commands can be processed in ver.1.0.4 environment.
+- Only 65536 literals/commands can be processed on ver.1.0.4 environment.  
 
 Links
 ---

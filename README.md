@@ -13,10 +13,12 @@ How to run
 ---
 1. Open this URL in your browser
     - http://wt2.perfume-global.com/?p=9bc4cae08f5782d4c5361a4f860b3e64
+    - http://wt2.perfume-global.com/?p=c70e6829ca458ccd8b0d5836bdd3503d (modified version)
 
 Known issues
 ---
 - Only 65536 literals/commands can be processed on ver.1.0.4 environment.  
+
 
 Links
 ---
